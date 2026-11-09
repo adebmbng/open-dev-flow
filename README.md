@@ -47,7 +47,7 @@ npm test
 5. **Implementation review.** Review the PR links carried from the saved implementation artifact (or enter them manually), run the review, and inspect the generated review artifact and any changes. The configured review skill can publish GitHub reviews and comments.
 6. **Inspect and continue.** Use session history to view handoffs and logs. The manual Terminal tab runs your own shell in a selected checkout. Claude and OpenCode sessions can be resumed in their original step; Codex resume is not yet exposed.
 
-Shared artifacts can also be edited and saved manually. An automatic capture stops if the artifact was edited while the agent was preparing it. Agent work remains subject to the available CLI, repository access, and authentication; unavailable operations must be reported as gaps.
+Shared artifacts can also be edited and saved manually. The server monitors pending captures even if the browser page closes; reconnect to the session to see their status. You can cancel a pending capture and retry when the agent is ready. Cancelling capture does not stop the agent. An automatic capture stops if the artifact was edited while the agent was preparing it. Pending jobs do not survive a server restart. Agent work remains subject to the available CLI, repository access, and authentication; unavailable operations must be reported as gaps.
 
 ## Current integrations and limits
 
