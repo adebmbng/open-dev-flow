@@ -44,7 +44,7 @@ npm test
 2. **Discovery and Q&A.** Ask the agent about the existing system. Generate the discovery artifact from the session, review it, and ask follow-up questions.
 3. **Technical plan.** Discuss design options with the agent. Save and approve the plan and test-data table.
 4. **Implementation and optional automation.** Start the selected stages explicitly. Implementation is instructed to fetch the latest `master` and use a dedicated worktree. API and UI automation can be skipped or selected independently.
-5. **Implementation review.** Supply PR links, run the review, and inspect the generated review artifact and any changes. The configured review skill can publish GitHub reviews and comments.
+5. **Implementation review.** Review the PR links carried from the saved implementation artifact (or enter them manually), run the review, and inspect the generated review artifact and any changes. The configured review skill can publish GitHub reviews and comments.
 6. **Inspect and continue.** Use session history to view handoffs and logs. The manual Terminal tab runs your own shell in a selected checkout. Claude sessions can be resumed; Codex resume is not yet exposed.
 
 Shared artifacts can also be edited and saved manually. An automatic capture stops if the artifact was edited while the agent was preparing it. Agent work remains subject to the available CLI, repository access, and authentication; unavailable operations must be reported as gaps.
