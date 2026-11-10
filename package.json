@@ -22,5 +22,8 @@
     "ws": "^8.22.1"
   },
   "private": true,
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "jsdom": "^26.1.0"
+  }
 }
