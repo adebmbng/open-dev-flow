@@ -13,7 +13,7 @@ const stages = [
 ];
 const sessions = {
   A: [{ id: 'session-a', stage: 'discovery', provider: 'claude', status: 'running', created: '2026-01-01T00:00:00Z', native_id: 'native-a', cwd: '/a' }],
-  B: [{ id: 'session-b', stage: 'implementation', provider: 'claude', status: 'running', created: '2026-01-02T00:00:00Z', native_id: 'native-b', cwd: '/b' }],
+  B: [{ id: 'session-b', stage: 'discovery', provider: 'claude', status: 'running', created: '2026-01-02T00:00:00Z', native_id: 'native-b', cwd: '/b' }, { id: 'session-b-impl', stage: 'implementation', provider: 'claude', status: 'running', created: '2026-01-03T00:00:00Z', native_id: 'native-b-impl', cwd: '/b' }],
 };
 function response(value) { return { ok: true, status: 200, json: async () => value, text: async () => '' }; }
 async function eventually(predicate) {
@@ -21,7 +21,7 @@ async function eventually(predicate) {
   throw Error('Timed out waiting for the workspace UI');
 }
 
-test('switching initiatives shows the destination sessions and attaches the correct step', async () => {
+test('switching initiatives keeps history scoped to the selected step and attaches the correct session', async () => {
   const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
   const dom = new JSDOM(html, { url: 'http://127.0.0.1:3210/', runScripts: 'outside-only', pretendToBeVisual: true });
   const w = dom.window, sockets = [];
@@ -67,10 +67,14 @@ test('switching initiatives shows the destination sessions and attaches the corr
     await eventually(() => w.document.querySelector('#title').textContent === 'Initiative B' && w.document.querySelector('#history-list').textContent.includes('native-b'));
     assert.equal(sockets[0].readyState, 3, 'switching initiatives detaches A');
     assert.equal(w.document.querySelector('#history-list').textContent.includes('native-a'), false);
+    assert.equal(w.document.querySelector('#history-list').textContent.includes('native-b-impl'), false, 'other steps are excluded');
     assert.equal(w.document.querySelector('#history').hidden, false, 'History remains visible after switching');
-    w.document.querySelector('[data-attach="session-b"]').click();
+    w.document.querySelector('[data-stage="implementation"]').click();
+    assert.equal(w.document.querySelector('#history-list').textContent.includes('native-b-impl'), true);
+    assert.equal(w.document.querySelector('[data-attach="session-b"]'), null);
+    w.document.querySelector('[data-attach="session-b-impl"]').click();
     await eventually(() => sockets.length === 2 && sockets[1].readyState === 1);
-    assert.match(sockets[1].url, /id=session-b/);
+    assert.match(sockets[1].url, /id=session-b-impl/);
     assert.equal(w.document.querySelector('#stage-title').textContent, 'Implementation PR');
     assert.equal(w.document.querySelector('#handoff').hidden, false);
   } finally { dom.window.close(); }
