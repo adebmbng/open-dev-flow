@@ -42,7 +42,7 @@ npm test
 
 ## Workflow
 
-1. **Create an initiative.** Select and arrange the built-in steps, then register the local repository paths. The same checkout can serve multiple roles. Technical plan must precede implementation, review, and automation steps.
+1. **Create an initiative.** Optionally add a Jira issue key or link and a Confluence PRD link. Select and arrange the built-in steps, then register the local repository paths. Discovery and planning agents are instructed to read those references and relevant Confluence PRDs linked from the ticket description; inaccessible content is reported as a gap. Implementation carries the Jira reference into branch, worktree, and PR instructions. The same checkout can serve multiple roles. Technical plan must precede implementation, review, and automation steps.
 2. **Discovery and Q&A.** Ask the agent about the existing system. Generate the discovery artifact from the session, review it, and ask follow-up questions.
 3. **Technical plan.** Discuss design options with the agent. Save and approve the plan and test-data table.
 4. **Implementation and optional automation.** Start the selected stages explicitly. Implementation is instructed to fetch the latest `master` and use a dedicated worktree. API and UI automation can be skipped or selected independently.
