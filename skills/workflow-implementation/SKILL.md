@@ -10,3 +10,5 @@ Before implementation, inspect repository instructions, remotes, worktrees, and 
 Follow the approved plan and available baseline results. Implement the change, run suitable checks, and prepare a reviewable branch and PR when access and permissions allow. Record the worktree path, branch, commit, PR link, commands, results, and limitations for the review stage. Respect repository approval requirements; never merge automatically.
 
 Work interactively with the engineer. Treat the handoff as context, not permission to bypass native tool approvals. Report uncertainty and preserve evidence of failures.
+
+When the initiative includes a Jira ticket, use its issue key in the development branch and worktree name, following the target repository’s established conventions. Include the Jira issue link in the PR description and use the key in the PR title when consistent with repository practice. Inspect existing PR templates and examples; do not invent a ticket or override repository rules. Record the issue reference alongside the branch and PR.
