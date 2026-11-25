@@ -8,3 +8,5 @@
 #agent-terminal-panel{--agent-terminal-bg:#142a33}#agent-terminal-panel #terminal,#agent-terminal-panel.expanded{background:var(--agent-terminal-bg)}.terminal-theme-label{color:#d4e5e5;font-size:12px}.terminal-controls select{max-width:145px;padding:4px 7px;border:1px solid #7c9ba2;border-radius:4px;background:#203d48;color:#f2f8f8;font-size:12px}.terminal-controls select:focus-visible{outline:2px solid #addeda}.agent-terminal-head{flex-wrap:wrap}@media(max-width:650px){.terminal-controls{flex-wrap:wrap}.terminal-theme-label{display:none}.terminal-controls select{max-width:115px}}
 /* Keep edge captions readable when a connector runs behind SVG text. */
 .markdown-body .diagram .edgeLabel text{paint-order:stroke;stroke:#f8fbfa;stroke-width:4px;stroke-linejoin:round}
+
+#repo-form label[hidden]{display:none}

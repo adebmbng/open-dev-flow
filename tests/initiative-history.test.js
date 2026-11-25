@@ -7,9 +7,10 @@ const { JSDOM } = require('jsdom');
 
 const root = path.join(__dirname, '..');
 const stages = [
-  { id: 'discovery', title: 'Discovery & Q&A', artifacts: ['discovery'] },
-  { id: 'planning', title: 'Technical plan', artifacts: ['plan', 'test-data'] },
-  { id: 'implementation', title: 'Implementation PR', artifacts: ['plan', 'test-data'] },
+  { id: 'discovery', role: 'discovery', title: 'Discovery & Q&A', artifacts: ['discovery'] },
+  { id: 'planning', role: 'service', title: 'Technical plan', artifacts: ['plan', 'test-data'] },
+  { id: 'implementation', role: 'service', title: 'Implementation PR', artifacts: ['plan', 'test-data'] },
+  { id: 'new-automation', role: 'api', title: 'New automation', artifacts: ['plan', 'test-data'] },
 ];
 const sessions = {
   A: [{ id: 'session-a', stage: 'discovery', provider: 'claude', status: 'running', created: '2026-01-01T00:00:00Z', native_id: 'native-a', cwd: '/a' }],
@@ -25,7 +26,8 @@ test('switching initiatives keeps history scoped to the selected step and attach
   const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
   const dom = new JSDOM(html, { url: 'http://127.0.0.1:3210/', runScripts: 'outside-only', pretendToBeVisual: true });
   const w = dom.window, sockets = [];
-  const boot = { token: 'test', workflowCustomization: true, captureRecovery: true, explicitPrReview: true, stages, kinds: ['discovery','plan','test-data','implementation'], roles: [], providers: { claude: true } };
+  w.HTMLDialogElement.prototype.showModal = function() { this.open = true; };
+  const boot = { token: 'test', workflowCustomization: true, captureRecovery: true, explicitPrReview: true, stages, kinds: ['discovery','plan','test-data','implementation'], roles: ['discovery','service','api','ui'], providers: { claude: true } };
   const changes = ['A', 'B'].map(id => ({ id, title: `Initiative ${id}`, description: '' }));
   w.fetch = async url => {
     if (url === '/api/bootstrap') return response(boot);
@@ -33,7 +35,7 @@ test('switching initiatives keeps history scoped to the selected step and attach
     const match = String(url).match(/^\/api\/changes\/([AB])(?:\/(.*))?$/);
     if (match) {
       const [, id, rest] = match;
-      if (!rest) return response({ ...changes.find(c => c.id === id), workflow: stages.map(s => s.id), stages: [], repos: [], artifacts: [], approval: null, sessions: sessions[id] });
+      if (!rest) return response({ ...changes.find(c => c.id === id), workflow: stages.filter(s => id === 'B' || s.id !== 'new-automation').map(s => s.id), stages: [], repos: [], artifacts: [], approval: null, sessions: sessions[id] });
       if (rest === 'overlaps') return response([]);
       if (rest === 'shell') return response(null);
       if (rest.startsWith('artifacts/')) return response([]);
@@ -59,12 +61,20 @@ test('switching initiatives keeps history scoped to the selected step and attach
     await eventually(() => w.document.querySelector('[data-change="A"]'));
     w.document.querySelector('[data-change="A"]').click();
     await eventually(() => w.document.querySelector('#history-list').textContent.includes('native-a'));
+    w.document.querySelector('#repos-button').click();
+    for (const role of ['api','ui']) assert.equal(w.document.querySelector(`#repo-form [name="${role}"]`).closest('label').hidden, true);
+    for (const role of ['discovery','service']) assert.equal(w.document.querySelector(`#repo-form [name="${role}"]`).closest('label').hidden, false);
+    assert.equal(w.document.querySelector('#repo-summary').textContent.includes('api'), false);
+    w.document.querySelector('#repo-dialog').open = false;
     w.document.querySelector('[data-tab="history"]').click();
     w.document.querySelector('[data-attach="session-a"]').click();
     await eventually(() => sockets.length === 1 && sockets[0].readyState === 1);
     w.document.querySelector('[data-tab="history"]').click();
     w.document.querySelector('[data-change="B"]').click();
     await eventually(() => w.document.querySelector('#title').textContent === 'Initiative B' && w.document.querySelector('#history-list').textContent.includes('native-b'));
+    w.document.querySelector('#repos-button').click();
+    for (const role of ['api','ui']) assert.equal(w.document.querySelector(`#repo-form [name="${role}"]`).closest('label').hidden, false);
+    w.document.querySelector('#repo-dialog').open = false;
     assert.equal(sockets[0].readyState, 3, 'switching initiatives detaches A');
     assert.equal(w.document.querySelector('#history-list').textContent.includes('native-a'), false);
     assert.equal(w.document.querySelector('#history-list').textContent.includes('native-b-impl'), false, 'other steps are excluded');
