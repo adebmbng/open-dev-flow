@@ -30,7 +30,7 @@ npm start
 
 Open [http://127.0.0.1:3210](http://127.0.0.1:3210). To use a different port, run `PORT=3211 npm start`.
 
-Use the **Prerequisites** link to check the selected agent CLI, Atlassian MCP, and recommended BFI skill files before starting. The page is advisory and you can continue with missing items. Skill file detection does not confirm that a plugin is enabled, and MCP configuration does not necessarily confirm authentication or connectivity. Some workflow steps have their own requirements; implementation review requires its review skill files.
+Use the **Prerequisites** link to check the selected agent CLI, Atlassian MCP, and recommended BFI skill files before starting. You can select Codacy, gcloud, Atlassian MCP, or BFI skills and start an interactive setup agent on that page. The selected agent must already be installed; it uses its normal permissions, and the engineer completes any sign-in. Setup sessions run independently of initiatives and can be reattached while the server remains running. The page is advisory and you can continue with missing items. Skill file detection does not confirm that a plugin is enabled, and MCP configuration does not necessarily confirm authentication or connectivity. Some workflow steps have their own requirements; implementation review requires its review skill files.
 
 State, artifacts, and terminal logs are stored under `.workflow/` by default. Set `WORKFLOW_DATA_DIR` to use another directory. The `.workflow/` and `projects/` directories and installed dependencies are ignored by Git. Terminal output can contain sensitive information, so protect the data directory as you would the associated checkouts.
 
