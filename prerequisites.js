@@ -5,7 +5,7 @@ const os=require('node:os');
 const {execFile}=require('node:child_process');
 const {promisify}=require('node:util');
 const run=promisify(execFile);
-const names=['appointment-availability-diagnosis','atlassian-version-creation','auto-review-pr','claude-technical-note-writer','code-review','confluence-writer','graphify-layers','source-cited-investigation','technical-note-writer'];
+const names=['bravo-gcloud-log-investigation','appointment-availability-diagnosis','atlassian-version-creation','auto-review-pr','claude-technical-note-writer','code-review','confluence-writer','graphify-layers','source-cited-investigation','technical-note-writer'];
 const exists=p=>{try{return fs.statSync(p).isFile()}catch{return false}};
 function cacheSkills(home,agent){const base=path.join(home,agent==='codex'?'.codex/plugins/cache':'.claude/plugins/cache','bfi-ai-agents','bfi-agent-skills');try{return fs.readdirSync(base).map(v=>path.join(base,v,'skills'))}catch{return []}}
 async function check(agent){

@@ -67,6 +67,14 @@ test('debug issue runs independently and hands findings into planning',async()=>
  const result=await request(`/api/captures/${capture.data.id}`);assert.equal(result.data.status,'completed');
  await request(`/api/changes/${id}/repos/service`,'PUT',{path:tmp});const plan=await request(`/api/changes/${id}/preview`,'POST',{stage:'planning'});assert.equal(plan.status,200);assert.ok(plan.data.artifacts.some(a=>a.kind==='debug-issue'&&a.content==='Evidence from logs'));
 });
+test('debug handoff loads configured external skill and falls back when unavailable',async()=>{
+ const id=(await request('/api/changes','POST',{title:'Debug external skill',workflow:['debug-issue']})).data.id;
+ const source=path.join(tmp,'debug-guidance.md');fs.writeFileSync(source,'Domain-specific evidence and project mapping');
+ process.env.OPEN_DEV_FLOW_DEBUG_SKILL=source;
+ try{const found=await request(`/api/changes/${id}/preview`,'POST',{stage:'debug-issue',provider:'claude'});assert.equal(found.status,200);assert.equal(found.data.debugGuidance.status,'available');assert.equal(found.data.debugGuidance.path,source);assert.match(found.data.debugGuidance.sha256,/^[a-f0-9]{64}$/);assert.match(promptFor(found.data),/Domain-specific evidence and project mapping/);
+ process.env.OPEN_DEV_FLOW_DEBUG_SKILL=path.join(tmp,'missing-skill.md');const missing=await request(`/api/changes/${id}/preview`,'POST',{stage:'debug-issue',provider:'claude'});assert.equal(missing.status,200);assert.equal(missing.data.debugGuidance.status,'unavailable');assert.match(promptFor(missing.data),/avoid guessing project IDs/);assert.doesNotMatch(missing.data.skill,/bravo-project-/);
+ }finally{delete process.env.OPEN_DEV_FLOW_DEBUG_SKILL;}
+});
 test('Codacy scope selection flows into technical planning',async()=>{
  assert.equal((await request('/api/changes','POST',{title:'No plan',workflow:['codacy-issues']})).status,400);
  assert.equal((await request('/api/changes','POST',{title:'Wrong order',workflow:['planning','codacy-issues']})).status,400);
