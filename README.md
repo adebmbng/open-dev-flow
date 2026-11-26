@@ -11,7 +11,7 @@ A local, engineer-led workspace for taking a software change from discovery to i
 - Use the interactive agent terminal or open a separate manual terminal in a registered checkout.
 - Keep versioned artifacts, approval records, session history, and handoff snapshots locally.
 
-The engineer starts each step explicitly. Editing an approved plan or test-data table makes the approval stale. Implementation, review, and automation require the current plan and test data to be approved. Plan approval does not grant separate permissions for agent actions.
+Agents are instructed to respond in English, including in shared artifacts; source quotations, identifiers, code, and logs can retain their original form for accuracy. The engineer starts each step explicitly. Editing an approved plan or test-data table makes the approval stale. Implementation, review, and automation require the current plan and test data to be approved. Plan approval does not grant separate permissions for agent actions.
 
 ## Requirements
 
