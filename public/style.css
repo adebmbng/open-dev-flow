@@ -10,3 +10,5 @@
 .markdown-body .diagram .edgeLabel text{paint-order:stroke;stroke:#f8fbfa;stroke-width:4px;stroke-linejoin:round}
 
 #repo-form label[hidden]{display:none}
+
+.notification-toggle{background:transparent;border:1px solid #84b1b3;color:#e5f4f3;font-size:12px;padding:5px 9px;margin-right:10px}.notification-toggle:disabled{opacity:.6}

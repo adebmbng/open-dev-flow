@@ -25,7 +25,11 @@ async function eventually(predicate) {
 test('switching initiatives keeps history scoped to the selected step and attaches the correct session', async () => {
   const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
   const dom = new JSDOM(html, { url: 'http://127.0.0.1:3210/', runScripts: 'outside-only', pretendToBeVisual: true });
-  const w = dom.window, sockets = [];
+  const w = dom.window, sockets = [], notices = [], notificationPolls = [];
+  let eventRequests = 0;
+  w.Notification = class { static permission = 'default'; static async requestPermission(){ this.permission = 'granted'; return 'granted'; } constructor(title, options){notices.push({title,...options});} close(){} };
+  w.setInterval = fn => { notificationPolls.push(fn); return notificationPolls.length; };
+  w.clearInterval = () => {};
   w.HTMLDialogElement.prototype.showModal = function() { this.open = true; };
   w.HTMLDialogElement.prototype.close = function() { this.open = false; };
   const boot = { token: 'test', workflowCustomization: true, workflowStepInsertion: true, captureRecovery: true, explicitPrReview: true, stages, kinds: ['discovery','plan','test-data','implementation','baseline-api','new-automation'], roles: ['discovery','service','api','ui'], providers: { claude: true } };
@@ -33,6 +37,7 @@ test('switching initiatives keeps history scoped to the selected step and attach
   const workflows = { A: stages.filter(s => s.id !== 'new-automation').map(s => s.id), B: stages.map(s => s.id) };
   w.fetch = async (url, options) => {
     if (url === '/api/bootstrap') return response(boot);
+    if (String(url).startsWith('/api/agent-events')) { eventRequests++; return response(eventRequests===1?{epoch:'test',cursor:0,events:[]}:{epoch:'test',cursor:1,events:[{sequence:1,sessionId:'done',stage:'discovery',title:'Other initiative',type:'session-exit',code:0}]}); }
     if (url === '/api/changes') return response(changes);
     const match = String(url).match(/^\/api\/changes\/([AB])(?:\/(.*))?$/);
     if (match) {
@@ -62,6 +67,15 @@ test('switching initiatives keeps history scoped to the selected step and attach
   w.eval(fs.readFileSync(path.join(root, 'public/app.js'), 'utf8'));
   try {
     await eventually(() => w.document.querySelector('[data-change="A"]'));
+    w.document.querySelector('#notifications-toggle').click();
+    await eventually(() => eventRequests === 1 && notificationPolls.length === 1);
+    notificationPolls[0]();
+    await eventually(() => notices.length === 1);
+    assert.equal(notices[0].title, 'Other initiative');
+    assert.match(notices[0].body, /agent session ended/);
+    w.document.querySelector('#notifications-toggle').click();
+    assert.equal(w.document.querySelector('#notifications-toggle').textContent, 'Enable notifications');
+
     w.document.querySelector('[data-change="A"]').click();
     await eventually(() => w.document.querySelector('#history-list').textContent.includes('native-a'));
     w.document.querySelector('#repos-button').click();
