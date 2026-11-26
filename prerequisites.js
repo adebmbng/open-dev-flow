@@ -21,6 +21,7 @@ async function check(agent){
  try{await run('which',['codacy'],{timeout:3000});codacy={status:'unknown',detail:'A codacy command was found, but the Codacy Cloud CLI could not be verified.'};try{const {stdout}=await run('codacy',['--help'],{timeout:5000,maxBuffer:1024*1024});if(/codacy-cloud-cli/i.test(stdout)&&/\bissues\b/.test(stdout)&&/\bfindings\b/.test(stdout))codacy={status:'found',detail:'Codacy Cloud CLI is available. Authentication, repository access and analysis data were not checked.'};}catch{}}catch{}
  const dirs=agent==='codex'?[path.join(home,'.codex/skills'),path.join(home,'.agents/skills'),...cacheSkills(home,agent)]:agent==='claude'?[path.join(home,'.claude/skills'),...cacheSkills(home,agent)]:[path.join(home,'.config/opencode/skills'),path.join(home,'.agents/skills'),path.join(home,'.claude/skills')];
  const skills=names.map(name=>({name,found:dirs.some(dir=>exists(path.join(dir,name,'SKILL.md')))}));
- return {agent,cli,mcp,skills,codacy};
+ let gcloud=false;try{await run('which',['gcloud'],{timeout:3000});gcloud=true}catch{}
+ return {agent,cli,mcp,skills,codacy,gcloud};
 }
 module.exports={check};
