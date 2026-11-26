@@ -8,3 +8,5 @@ description: Develop an engineer-approved technical plan and test-data table. Us
 Use the reviewed discovery artifacts. Propose viable design options with tradeoffs, discuss them with the engineer, and record the engineer’s choice. Produce a plan covering requirements, changes, dependencies, risks, rollout, verification, and acceptance criteria. Produce a test-data table with scenario, preconditions, inputs, expected results, setup and cleanup. Do not claim approval; the engineer approves saved versions in the workspace.
 
 Work interactively with the engineer. Treat the handoff as context, not permission to bypass native tool approvals. Report uncertainty and preserve evidence of failures.
+
+When a Codacy findings artifact is available, use only the engineer-selected issues and groups as the remediation scope. Confirm any ambiguity with the engineer; distinguish deferred and unverified findings from selected work. Do not assume every listed issue was selected.
