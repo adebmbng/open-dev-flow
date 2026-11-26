@@ -27,7 +27,7 @@ test('switching initiatives keeps history scoped to the selected step and attach
   const dom = new JSDOM(html, { url: 'http://127.0.0.1:3210/', runScripts: 'outside-only', pretendToBeVisual: true });
   const w = dom.window, sockets = [];
   w.HTMLDialogElement.prototype.showModal = function() { this.open = true; };
-  const boot = { token: 'test', workflowCustomization: true, captureRecovery: true, explicitPrReview: true, stages, kinds: ['discovery','plan','test-data','implementation'], roles: ['discovery','service','api','ui'], providers: { claude: true } };
+  const boot = { token: 'test', workflowCustomization: true, captureRecovery: true, explicitPrReview: true, stages, kinds: ['discovery','plan','test-data','implementation','baseline-api','new-automation'], roles: ['discovery','service','api','ui'], providers: { claude: true } };
   const changes = ['A', 'B'].map(id => ({ id, title: `Initiative ${id}`, description: '' }));
   w.fetch = async url => {
     if (url === '/api/bootstrap') return response(boot);
@@ -65,6 +65,8 @@ test('switching initiatives keeps history scoped to the selected step and attach
     for (const role of ['api','ui']) assert.equal(w.document.querySelector(`#repo-form [name="${role}"]`).closest('label').hidden, true);
     for (const role of ['discovery','service']) assert.equal(w.document.querySelector(`#repo-form [name="${role}"]`).closest('label').hidden, false);
     assert.equal(w.document.querySelector('#repo-summary').textContent.includes('api'), false);
+    assert.equal(w.document.querySelector('#selection input[value="new-automation"]'), null);
+    assert.ok(w.document.querySelector('#selection input[value="plan"]'));
     w.document.querySelector('#repo-dialog').open = false;
     w.document.querySelector('[data-tab="history"]').click();
     w.document.querySelector('[data-attach="session-a"]').click();
@@ -75,6 +77,7 @@ test('switching initiatives keeps history scoped to the selected step and attach
     w.document.querySelector('#repos-button').click();
     for (const role of ['api','ui']) assert.equal(w.document.querySelector(`#repo-form [name="${role}"]`).closest('label').hidden, false);
     w.document.querySelector('#repo-dialog').open = false;
+    assert.ok(w.document.querySelector('#selection input[value="new-automation"]'));
     assert.equal(sockets[0].readyState, 3, 'switching initiatives detaches A');
     assert.equal(w.document.querySelector('#history-list').textContent.includes('native-a'), false);
     assert.equal(w.document.querySelector('#history-list').textContent.includes('native-b-impl'), false, 'other steps are excluded');
