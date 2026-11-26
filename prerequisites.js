@@ -17,8 +17,10 @@ async function check(agent){
   if(agent==='codex'){const servers=JSON.parse(stdout);const match=servers.find(s=>/atlassian/i.test(s.name));mcp=match?{status:match.enabled?'configured':'missing',detail:match.enabled?'Atlassian MCP is configured and enabled. Connection and authentication were not tested.':'Atlassian MCP is configured but disabled.'}:{status:'missing',detail:'No Atlassian MCP server was found in the agent configuration.'}}
   else {const line=stdout.split('\n').find(s=>/atlassian/i.test(s));mcp=line?{status:/connected/i.test(line)&&!/not connected|disconnected/i.test(line)?'connected':'configured',detail:/connected/i.test(line)&&!/not connected|disconnected/i.test(line)?'Atlassian MCP reports a connection.':'Atlassian MCP appears in the agent list; connection and authentication may need attention.'}:{status:'missing',detail:'No Atlassian MCP server was found in the agent list.'}}
  }catch{}
+ let codacy={status:'missing',detail:'Install the Codacy Cloud CLI and make codacy available on PATH for the Codacy workflow.'};
+ try{await run('which',['codacy'],{timeout:3000});codacy={status:'unknown',detail:'A codacy command was found, but the Codacy Cloud CLI could not be verified.'};try{const {stdout}=await run('codacy',['--help'],{timeout:5000,maxBuffer:1024*1024});if(/codacy-cloud-cli/i.test(stdout)&&/\bissues\b/.test(stdout)&&/\bfindings\b/.test(stdout))codacy={status:'found',detail:'Codacy Cloud CLI is available. Authentication, repository access and analysis data were not checked.'};}catch{}}catch{}
  const dirs=agent==='codex'?[path.join(home,'.codex/skills'),path.join(home,'.agents/skills'),...cacheSkills(home,agent)]:agent==='claude'?[path.join(home,'.claude/skills'),...cacheSkills(home,agent)]:[path.join(home,'.config/opencode/skills'),path.join(home,'.agents/skills'),path.join(home,'.claude/skills')];
  const skills=names.map(name=>({name,found:dirs.some(dir=>exists(path.join(dir,name,'SKILL.md')))}));
- return {agent,cli,mcp,skills};
+ return {agent,cli,mcp,skills,codacy};
 }
 module.exports={check};
