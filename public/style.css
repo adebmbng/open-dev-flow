@@ -12,3 +12,4 @@
 #repo-form label[hidden]{display:none}
 
 .notification-toggle{background:transparent;border:1px solid #84b1b3;color:#e5f4f3;font-size:12px;padding:5px 9px;margin-right:10px}.notification-toggle:disabled{opacity:.6}
+.custom-tag{display:inline-block;font-style:normal;font-size:11px;font-weight:700;background:#e1f1ef;color:#126f78;border-radius:20px;padding:1px 7px;margin-left:6px;vertical-align:1px}
