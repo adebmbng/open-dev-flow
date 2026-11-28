@@ -19,7 +19,7 @@ Agents are instructed to respond in English, including in shared artifacts; sour
 - npm and at least one locally installed and authenticated `codex`, `claude`, or `opencode` CLI. OpenCode must support creating a session with `--session` and `--prompt` (verified with v2.2.2).
 - Local checkouts for the repositories used by the selected workflow. `node-pty` may require native build tools if a prebuilt binary is not available.
 
-Claude Code sessions are launched with `--dangerously-skip-permissions`, including on resume. They can act with the local user's permissions without prompting. Codex and OpenCode use their configured permissions. The server listens on loopback and is designed for a single local user, not network exposure.
+Claude Code sessions are launched with `--dangerously-skip-permissions`, including on resume. They can act with the local user's permissions without prompting. Codex and OpenCode use their configured permissions. The server defaults to loopback and is designed for a single trusted user.
 
 ## Run locally
 
@@ -29,6 +29,16 @@ npm start
 ```
 
 Open [http://127.0.0.1:3210](http://127.0.0.1:3210). To use a different port, run `PORT=3211 npm start`.
+
+To access the workspace over Tailscale, bind to this machine's Tailscale IP address and open that address on an authorized device:
+
+```sh
+HOST=100.x.y.z npm start
+```
+
+Open `http://100.x.y.z:3210` on the other device. If you prefer its Tailscale DNS name, include it in `ALLOWED_HOSTS`, for example `HOST=100.x.y.z ALLOWED_HOSTS=my-machine.example.ts.net npm start`. `ALLOWED_HOSTS` accepts comma-separated hostnames or IP addresses. To listen on all IPv4 interfaces, use `HOST=0.0.0.0` and list each browser hostname or IP in `ALLOWED_HOSTS`.
+
+**Network access grants control of this machine.** The app has no user authentication; anyone who can reach it can use terminals and agents with your user permissions. Restrict access using Tailscale policy and your firewall, and bind to the Tailscale IP rather than all interfaces when possible. Plain HTTP does not encrypt traffic outside an encrypted network. This is not a multi-user deployment.
 
 Use the **Prerequisites** link to check the selected agent CLI, Atlassian MCP, and recommended BFI skill files before starting. You can select Codacy, gcloud, Atlassian MCP, or BFI skills and start an interactive setup agent on that page. The selected agent must already be installed; it uses its normal permissions, and the engineer completes any sign-in. Setup sessions run independently of initiatives and can be reattached while the server remains running. The page is advisory and you can continue with missing items. Skill file detection does not confirm that a plugin is enabled, and MCP configuration does not necessarily confirm authentication or connectivity. Some workflow steps have their own requirements; implementation review requires its review skill files.
 
